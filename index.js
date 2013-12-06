@@ -76,7 +76,7 @@
       || this.batch.scheduled;
 
     // If a frame isn't needed, return
-    if (doesntNeedFrame) return id;
+    if (doesntNeedFrame) return job;
 
     // Schedule a new
     // frame, then return
@@ -109,7 +109,7 @@
       || this.batch.scheduled;
 
     // If a frame isn't needed, return
-    if (doesntNeedFrame) return id;
+    if (doesntNeedFrame) return job;
 
     // Schedule a new
     // frame, then return
