@@ -81,7 +81,7 @@
     // Schedule a new
     // frame, then return
     this.scheduleBatch();
-    return id;
+    return job;
   };
 
   /**
@@ -114,7 +114,7 @@
     // Schedule a new
     // frame, then return
     this.scheduleBatch();
-    return id;
+    return job;
   };
 
   /**
@@ -281,12 +281,16 @@
    */
   FastDom.prototype.add = function(type, fn, ctx) {
     var id = this.uniqueId();
-    return this.batch.hash[id] = {
+    var job = this.batch.hash[id] = {
       id: id,
       fn: fn,
       ctx: ctx,
-      type: type
+      type: type,
+      then: function(thenFn) {
+    	job.thenFn = thenFn;
+      }
     };
+    return job;
   };
 
   /**
@@ -323,17 +327,19 @@
     // has been registered, just
     // run the job normally.
     if (!this.onError) {
-      return fn.call(ctx);
-    }
-
-    // If an `onError` handler
-    // has been registered, catch
-    // errors that throw inside
-    // callbacks, and run the
-    // handler instead.
-    try { fn.call(ctx); } catch (e) {
-      this.onError(e);
-    }
+      fn.call(ctx);
+    } else {
+	    // If an `onError` handler
+	    // has been registered, catch
+	    // errors that throw inside
+	    // callbacks, and run the
+	    // handler instead.
+	    try { fn.call(ctx); } catch (e) {
+	      this.onError(e);
+	      return;
+	    }
+	}
+	if(job.thenFn) job.thenFn.call(ctx);
   };
 
   /**
